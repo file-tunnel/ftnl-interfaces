@@ -3,6 +3,12 @@ info:
   title: File Tunnel events
   version: 1.0.0
   description: Ordered tunnel events delivered over a ticket-authenticated WebSocket.
+x-file-tunnel-formal-model:
+  repository: https://github.com/file-tunnel/ftnl-backend-api.rs
+  manifest: formal/fm.toml
+  guarantees:
+    - event tickets are issued once and redeemed at most once
+    - terminal tunnel phases have no active event tickets
 servers:
   production:
     host: api.file-tunnel.dev

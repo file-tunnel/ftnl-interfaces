@@ -6,6 +6,12 @@ info:
 servers:
   - url: https://api.file-tunnel.dev
 security: []
+x-file-tunnel-formal-model:
+  repository: https://github.com/file-tunnel/ftnl-backend-api.rs
+  manifest: formal/fm.toml
+  module: file_tunnel_protocol
+  invariant: protocol_safety
+  implementationPolicy: src/protocol.rs
 paths:
   /v1/tunnels:
     post:

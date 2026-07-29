@@ -46,5 +46,8 @@ nix develop --command agent-check
 
 The checked-in Nix lock pins Node.js, Rust, Dart, Gleam, Erlang, and repository
 linting tools so generated bindings can be checked from one shell.
+OpenAPI and AsyncAPI include machine-readable pointers to the owning executable
+models; [`docs/formal-methods.md`](docs/formal-methods.md) maps each contract
+obligation to its proof and implementation check.
 
 All contents are licensed under MIT.
