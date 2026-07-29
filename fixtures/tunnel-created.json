@@ -1,0 +1,8 @@
+{
+  "api_version": "v1",
+  "tunnel_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847001",
+  "status": "waiting",
+  "pairing_uri": "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=pairing-secret-with-at-least-thirty-two-characters",
+  "desktop_capability": "desktop-capability-with-at-least-thirty-two-characters",
+  "expires_at": "2026-07-29T18:30:00Z"
+}

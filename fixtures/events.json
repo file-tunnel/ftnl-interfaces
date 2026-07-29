@@ -1,0 +1,18 @@
+[
+  {
+    "event_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847010",
+    "sequence": 1,
+    "occurred_at": "2026-07-29T18:20:00Z",
+    "tunnel_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847001",
+    "kind": "tunnel.connected"
+  },
+  {
+    "event_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847011",
+    "sequence": 2,
+    "occurred_at": "2026-07-29T18:20:02Z",
+    "tunnel_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847001",
+    "kind": "file.progress",
+    "file_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847020",
+    "bytes_transferred": 524288
+  }
+]

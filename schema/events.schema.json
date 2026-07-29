@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://file-tunnel.dev/schema/v1/events.schema.json",
+  "title": "File Tunnel realtime event",
+  "type": "object",
+  "properties": {
+    "event_id": {"type": "string", "format": "uuid"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "tunnel_id": {"type": "string", "format": "uuid"},
+    "kind": {
+      "type": "string",
+      "enum": [
+        "tunnel.connected",
+        "file.declared",
+        "file.progress",
+        "file.available",
+        "file.downloaded",
+        "file.rejected",
+        "tunnel.cancelled",
+        "tunnel.expired"
+      ]
+    },
+    "file_id": {"type": "string", "format": "uuid"},
+    "bytes_transferred": {"type": "integer", "minimum": 0},
+    "reason_code": {"type": "string", "maxLength": 64}
+  },
+  "required": ["event_id", "sequence", "occurred_at", "tunnel_id", "kind"],
+  "additionalProperties": false
+}

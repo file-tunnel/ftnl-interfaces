@@ -1,0 +1,13 @@
+{
+  "name": "ftnl-interfaces-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test scripts/contract.test.mjs"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  }
+}

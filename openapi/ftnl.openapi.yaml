@@ -1,0 +1,203 @@
+openapi: 3.1.0
+info:
+  title: File Tunnel API
+  version: 1.0.0
+  description: Ephemeral, capability-scoped cross-device file transfer.
+servers:
+  - url: https://api.file-tunnel.dev
+security: []
+paths:
+  /v1/tunnels:
+    post:
+      operationId: createTunnel
+      summary: Create an ephemeral tunnel from a desktop application.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schema/tunnel.schema.json#/$defs/createTunnelRequest
+      responses:
+        "201":
+          description: Tunnel created.
+          content:
+            application/json:
+              schema:
+                $ref: ../schema/tunnel.schema.json#/$defs/createTunnelResponse
+        "400":
+          $ref: "#/components/responses/Problem"
+  /v1/tunnels/{tunnel_id}/claim:
+    post:
+      operationId: claimTunnel
+      summary: Redeem the one-time pairing secret for a phone capability.
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schema/tunnel.schema.json#/$defs/claimTunnelRequest
+      responses:
+        "200":
+          description: Pairing secret redeemed.
+          content:
+            application/json:
+              schema:
+                $ref: ../schema/tunnel.schema.json#/$defs/claimTunnelResponse
+        "401":
+          $ref: "#/components/responses/Problem"
+        "409":
+          $ref: "#/components/responses/Problem"
+  /v1/tunnels/{tunnel_id}:
+    get:
+      operationId: getTunnel
+      summary: Fetch a point-in-time tunnel snapshot.
+      security:
+        - bearerCapability: []
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+      responses:
+        "200":
+          description: Current state.
+          content:
+            application/json:
+              schema:
+                $ref: ../schema/tunnel.schema.json#/$defs/tunnelSnapshot
+    delete:
+      operationId: cancelTunnel
+      summary: Cancel a tunnel and schedule content deletion.
+      security:
+        - bearerCapability: []
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+      responses:
+        "204":
+          description: Cancelled.
+  /v1/tunnels/{tunnel_id}/files:
+    post:
+      operationId: declareFile
+      summary: Declare upload metadata before sending bytes.
+      security:
+        - bearerCapability: []
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schema/tunnel.schema.json#/$defs/declareFileRequest
+      responses:
+        "201":
+          description: Upload slot created.
+          content:
+            application/json:
+              schema:
+                $ref: ../schema/tunnel.schema.json#/$defs/fileDescriptor
+        "413":
+          $ref: "#/components/responses/Problem"
+        "415":
+          $ref: "#/components/responses/Problem"
+  /v1/tunnels/{tunnel_id}/files/{file_id}/content:
+    put:
+      operationId: uploadFileContent
+      summary: Upload file bytes. Implementations may replace this with a presigned multipart plan.
+      security:
+        - bearerCapability: []
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+        - name: file_id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, contentEncoding: binary}
+      responses:
+        "204":
+          description: Upload completed and atomically published.
+        "409":
+          $ref: "#/components/responses/Problem"
+    get:
+      operationId: downloadFileContent
+      summary: Download completed bytes with the desktop capability.
+      security:
+        - bearerCapability: []
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+        - name: file_id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+      responses:
+        "200":
+          description: File content.
+          content:
+            application/octet-stream:
+              schema: {type: string, contentEncoding: binary}
+  /v1/tunnels/{tunnel_id}/event-tickets:
+    post:
+      operationId: createEventTicket
+      summary: Mint a one-time, short-lived ticket for a WebSocket connection.
+      security:
+        - bearerCapability: []
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+      responses:
+        "201":
+          description: Ticket minted.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ticket, expires_at]
+                properties:
+                  ticket: {type: string, minLength: 32}
+                  expires_at: {type: string, format: date-time}
+  /v1/tunnels/{tunnel_id}/events:
+    get:
+      operationId: connectEvents
+      summary: Upgrade to a WebSocket using a one-time event ticket.
+      parameters:
+        - $ref: "#/components/parameters/TunnelId"
+        - name: ticket
+          in: query
+          required: true
+          schema: {type: string, minLength: 32}
+      responses:
+        "101":
+          description: Switching protocols.
+components:
+  securitySchemes:
+    bearerCapability:
+      type: http
+      scheme: bearer
+  parameters:
+    TunnelId:
+      name: tunnel_id
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema: {type: string, minLength: 8, maxLength: 128}
+  responses:
+    Problem:
+      description: RFC 9457 problem detail.
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            required: [type, title, status]
+            properties:
+              type: {type: string, format: uri-reference}
+              title: {type: string}
+              status: {type: integer}
+              detail: {type: string}
+              code: {type: string}

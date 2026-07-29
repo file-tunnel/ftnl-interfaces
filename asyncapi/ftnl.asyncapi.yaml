@@ -1,0 +1,28 @@
+asyncapi: 3.0.0
+info:
+  title: File Tunnel events
+  version: 1.0.0
+  description: Ordered tunnel events delivered over a ticket-authenticated WebSocket.
+servers:
+  production:
+    host: api.file-tunnel.dev
+    protocol: wss
+channels:
+  tunnelEvents:
+    address: /v1/tunnels/{tunnel_id}/events
+    parameters:
+      tunnel_id:
+        description: Public routing identifier; authorization comes from the event ticket.
+    messages:
+      tunnelEvent:
+        $ref: "#/components/messages/TunnelEvent"
+operations:
+  receiveTunnelEvents:
+    action: receive
+    channel:
+      $ref: "#/channels/tunnelEvents"
+components:
+  messages:
+    TunnelEvent:
+      payload:
+        $ref: ../schema/events.schema.json

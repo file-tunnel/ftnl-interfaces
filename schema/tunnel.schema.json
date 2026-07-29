@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://file-tunnel.dev/schema/v1/tunnel.schema.json",
+  "title": "File Tunnel v1",
+  "type": "object",
+  "$defs": {
+    "tunnelId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tunnelStatus": {
+      "type": "string",
+      "enum": ["waiting", "connected", "transferring", "complete", "cancelled", "expired"]
+    },
+    "fileStatus": {
+      "type": "string",
+      "enum": ["declared", "uploading", "available", "downloaded", "rejected", "cancelled"]
+    },
+    "createTunnelRequest": {
+      "type": "object",
+      "properties": {
+        "application_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "accept": {
+          "type": "array",
+          "items": {"type": "string", "maxLength": 128},
+          "maxItems": 32,
+          "default": ["image/*"]
+        },
+        "max_files": {"type": "integer", "minimum": 1, "maximum": 100, "default": 10},
+        "max_file_bytes": {"type": "integer", "minimum": 1, "maximum": 5368709120, "default": 52428800},
+        "expires_in_seconds": {"type": "integer", "minimum": 60, "maximum": 3600, "default": 600}
+      },
+      "required": ["application_id"],
+      "additionalProperties": false
+    },
+    "createTunnelResponse": {
+      "type": "object",
+      "properties": {
+        "api_version": {"const": "v1"},
+        "tunnel_id": {"$ref": "#/$defs/tunnelId"},
+        "status": {"$ref": "#/$defs/tunnelStatus"},
+        "pairing_uri": {"type": "string", "format": "uri"},
+        "desktop_capability": {"type": "string", "minLength": 32},
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": ["api_version", "tunnel_id", "status", "pairing_uri", "desktop_capability", "expires_at"],
+      "additionalProperties": false
+    },
+    "claimTunnelRequest": {
+      "type": "object",
+      "properties": {
+        "pairing_secret": {"type": "string", "minLength": 32},
+        "device_label": {"type": "string", "maxLength": 128}
+      },
+      "required": ["pairing_secret"],
+      "additionalProperties": false
+    },
+    "claimTunnelResponse": {
+      "type": "object",
+      "properties": {
+        "phone_capability": {"type": "string", "minLength": 32},
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": ["phone_capability", "expires_at"],
+      "additionalProperties": false
+    },
+    "declareFileRequest": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 255},
+        "media_type": {"type": "string", "minLength": 1, "maxLength": 128},
+        "size_bytes": {"type": "integer", "minimum": 0, "maximum": 5368709120},
+        "last_modified_ms": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "required": ["name", "media_type", "size_bytes"],
+      "additionalProperties": false
+    },
+    "fileDescriptor": {
+      "type": "object",
+      "properties": {
+        "file_id": {"type": "string", "format": "uuid"},
+        "name": {"type": "string"},
+        "media_type": {"type": "string"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "bytes_transferred": {"type": "integer", "minimum": 0},
+        "status": {"$ref": "#/$defs/fileStatus"},
+        "created_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": ["file_id", "name", "media_type", "size_bytes", "bytes_transferred", "status", "created_at"],
+      "additionalProperties": false
+    },
+    "tunnelSnapshot": {
+      "type": "object",
+      "properties": {
+        "tunnel_id": {"$ref": "#/$defs/tunnelId"},
+        "status": {"$ref": "#/$defs/tunnelStatus"},
+        "expires_at": {"$ref": "#/$defs/timestamp"},
+        "files": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/fileDescriptor"}
+        }
+      },
+      "required": ["tunnel_id", "status", "expires_at", "files"],
+      "additionalProperties": false
+    }
+  }
+}

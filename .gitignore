@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+build/
+dist/
+.dart_tool/
+.packages
+pubspec.lock
+target/

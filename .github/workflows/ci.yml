@@ -1,0 +1,68 @@
+name: interfaces-ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: interfaces-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: Compile JSON Schema
+        run: |
+          npx --yes --package ajv-cli --package ajv-formats ajv compile \
+            --spec=draft2020 -c ajv-formats -s schema/tunnel.schema.json
+          npx --yes --package ajv-cli --package ajv-formats ajv compile \
+            --spec=draft2020 -c ajv-formats -s schema/events.schema.json
+  generated:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [rust, typescript, dart, gleam]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        if: matrix.target == 'rust'
+        with:
+          components: rustfmt, clippy
+      - uses: actions/setup-node@v4
+        if: matrix.target == 'typescript'
+        with:
+          node-version: 22
+      - uses: dart-lang/setup-dart@v1
+        if: matrix.target == 'dart'
+      - uses: erlef/setup-beam@v1
+        if: matrix.target == 'gleam'
+        with:
+          otp-version: "28"
+          gleam-version: "1.16.0"
+          rebar3-version: "3"
+      - if: matrix.target == 'rust'
+        run: |
+          cargo fmt --manifest-path generated/rust/Cargo.toml --check
+          cargo clippy --manifest-path generated/rust/Cargo.toml --all-targets -- -D warnings
+          cargo test --manifest-path generated/rust/Cargo.toml
+      - if: matrix.target == 'typescript'
+        working-directory: generated/typescript
+        run: npm install && npm test
+      - if: matrix.target == 'dart'
+        working-directory: generated/dart
+        run: dart pub get && dart format --output=none --set-exit-if-changed . && dart analyze && dart test
+      - if: matrix.target == 'gleam'
+        working-directory: generated/gleam
+        run: gleam format --check src test && gleam deps download && gleam test
