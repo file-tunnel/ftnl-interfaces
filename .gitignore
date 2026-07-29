@@ -6,3 +6,5 @@ dist/
 .packages
 pubspec.lock
 target/
+.cache/
+.direnv/

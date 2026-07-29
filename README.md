@@ -41,11 +41,10 @@ UUID alone grants no access.
 ## Validate
 
 ```bash
-npm test
-cargo test --manifest-path generated/rust/Cargo.toml
-(cd generated/typescript && npm test)
-(cd generated/dart && dart pub get && dart analyze && dart test)
-(cd generated/gleam && gleam test)
+nix develop --command agent-check
 ```
+
+The checked-in Nix lock pins Node.js, Rust, Dart, Gleam, Erlang, and repository
+linting tools so generated bindings can be checked from one shell.
 
 All contents are licensed under MIT.
