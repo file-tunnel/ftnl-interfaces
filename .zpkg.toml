@@ -16,10 +16,6 @@ tag_format = "v{version}"
 smoke_test = "test -f \"$ZED_PKG_TEST_TARGET/openapi/ftnl.openapi.yaml\" && test -f \"$ZED_PKG_TEST_TARGET/asyncapi/ftnl.asyncapi.yaml\""
 exclude = [".env", ".env.*", ".direnv/**", ".zed/**", ".zed-pack/**", "tmp/**", "**/*.log", ".DS_Store", "**/target/**", "**/node_modules/**", "**/.dart_tool/**"]
 
-[targets.repository]
-dir = "."
-name = "ftnl-interfaces-repository"
-
 [targets.rust]
 dir = "generated/rust"
 adapter = "rust"
