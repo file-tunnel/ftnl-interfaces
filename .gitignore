@@ -8,3 +8,7 @@ pubspec.lock
 target/
 .cache/
 .direnv/
+
+# zed-pkg local state
+/zed_modules/
+/.zed/pack/
