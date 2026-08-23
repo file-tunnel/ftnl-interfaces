@@ -4,10 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test scripts/contract.test.mjs"
+    "test": "node --test scripts/contract.test.mjs",
+    "lint:ores": "if [ -f .ores-lint/lint.sh ]; then sh .ores-lint/lint.sh; else echo 'ores-lint not installed'; fi",
+    "prepublishOnly": "npm run lint:ores"
   },
   "license": "MIT",
   "engines": {
     "node": ">=22"
+  },
+  "oresLint": {
+    "note": "Declared, not installed. ores-lint resolves these from a global install - see .ores-lint/README.md",
+    "requires": {
+      "eslint": ">=9",
+      "typescript-eslint": ">=8 (optional; without it .ts files are skipped)"
+    },
+    "install": "npm i -g eslint typescript-eslint"
   }
 }
