@@ -18,7 +18,7 @@ exclude = [".env", ".env.*", ".direnv/**", ".zed/**", ".zed-pack/**", "tmp/**", 
 
 [targets.repository]
 dir = "."
-name = "ftnl-interfaces-repository"
+name = "ftnl-interfaces"
 
 [targets.rust]
 dir = "generated/rust"
