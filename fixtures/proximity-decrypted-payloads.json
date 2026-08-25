@@ -1,0 +1,31 @@
+[
+  {
+    "payload_type": "shared_auth_step_up",
+    "exchange_id": "00000000-0000-4000-8000-000000000011",
+    "recipient_device_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "opaque_request_b64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "expires_at": "2026-08-24T18:05:00Z"
+  },
+  {
+    "payload_type": "peer_info_offer",
+    "transfer_id": "00000000-0000-4000-8000-000000000012",
+    "media_type": "application/json",
+    "content_size_bytes": 2,
+    "content_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "content_b64url": "e30",
+    "expires_at": "2026-08-24T18:05:00Z"
+  },
+  {
+    "payload_type": "update_manifest_offer",
+    "application_id": "dev.file-tunnel.desktop",
+    "platform": "ios",
+    "version": "1.2.3-testflight.4",
+    "distribution": "testflight",
+    "manifest_url": "https://updates.file-tunnel.dev/v1/ios/1.2.3-testflight.4.json",
+    "manifest_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "signature_algorithm": "ed25519",
+    "signer_key_id": "release-2026-08",
+    "manifest_signature_b64url": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "expires_at": "2026-08-24T18:05:00Z"
+  }
+]

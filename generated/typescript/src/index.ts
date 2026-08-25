@@ -67,6 +67,81 @@ export interface TunnelEvent {
   reason_code?: string;
 }
 
+export type ProximityMessage =
+  | DiscoveryAdvertisement
+  | HandshakeHello
+  | EncryptedFrame;
+
+export interface DiscoveryAdvertisement {
+  message_type: "discovery";
+  protocol_version: 1;
+  service_id: "66746e6c-0001-4b4c-8000-66746e6c0001";
+  discovery_id: string;
+  expires_at: string;
+}
+
+export interface HandshakeHello {
+  message_type: "hello";
+  protocol_version: 1;
+  attempt_id: string;
+  role: "initiator" | "responder";
+  ephemeral_public_key_b64url: string;
+  nonce_b64url: string;
+  expires_at: string;
+}
+
+export interface EncryptedFrame {
+  message_type: "encrypted_frame";
+  protocol_version: 1;
+  session_id: string;
+  sequence: number;
+  nonce_b64url: string;
+  ciphertext_b64url: string;
+  expires_at: string;
+}
+
+export type ProximityPayload =
+  | SharedAuthStepUpPayload
+  | PeerInfoOfferPayload
+  | UpdateManifestOfferPayload;
+
+export interface SharedAuthStepUpPayload {
+  payload_type: "shared_auth_step_up";
+  exchange_id: string;
+  recipient_device_fingerprint: string;
+  opaque_request_b64url: string;
+  expires_at: string;
+}
+
+export interface PeerInfoOfferPayload {
+  payload_type: "peer_info_offer";
+  transfer_id: string;
+  media_type: string;
+  content_size_bytes: number;
+  content_sha256: string;
+  content_b64url: string;
+  expires_at: string;
+}
+
+export interface UpdateManifestOfferPayload {
+  payload_type: "update_manifest_offer";
+  application_id: string;
+  platform: "android" | "ios" | "linux" | "macos" | "windows";
+  version: string;
+  distribution:
+    | "app_store"
+    | "testflight"
+    | "play_store"
+    | "managed_distribution"
+    | "direct_signed_package";
+  manifest_url: string;
+  manifest_sha256: string;
+  signature_algorithm: "ed25519";
+  signer_key_id: string;
+  manifest_signature_b64url: string;
+  expires_at: string;
+}
+
 export const pairingSecretFromUri = (uri: string): string | undefined => {
   const fragment = new URL(uri).hash.slice(1);
   return new URLSearchParams(fragment).get("c") ?? undefined;
