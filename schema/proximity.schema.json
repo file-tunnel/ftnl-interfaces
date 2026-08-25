@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://file-tunnel.dev/schema/v1/proximity.schema.json",
+  "title": "File Tunnel proximity transport v1",
+  "description": "Transport-neutral messages for an explicitly user-started, SAS-verified proximity session. Bluetooth, Wi-Fi, RSSI, OS bonding, and delivery are transport evidence only and never increase authentication assurance.",
+  "oneOf": [
+    {"$ref": "#/$defs/discoveryAdvertisement"},
+    {"$ref": "#/$defs/handshakeHello"},
+    {"$ref": "#/$defs/encryptedFrame"}
+  ],
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "base64url": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "discoveryAdvertisement": {
+      "type": "object",
+      "properties": {
+        "message_type": {"const": "discovery"},
+        "protocol_version": {"const": 1},
+        "service_id": {"const": "66746e6c-0001-4b4c-8000-66746e6c0001"},
+        "discovery_id": {
+          "type": "string",
+          "description": "Random 128-bit, per-attempt identifier. It is not an account or device identifier.",
+          "pattern": "^[A-Za-z0-9_-]{22}$"
+        },
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": ["message_type", "protocol_version", "service_id", "discovery_id", "expires_at"],
+      "additionalProperties": false
+    },
+    "handshakeHello": {
+      "type": "object",
+      "properties": {
+        "message_type": {"const": "hello"},
+        "protocol_version": {"const": 1},
+        "attempt_id": {"$ref": "#/$defs/uuid"},
+        "role": {"type": "string", "enum": ["initiator", "responder"]},
+        "ephemeral_public_key_b64url": {
+          "type": "string",
+          "description": "One-use 32-byte X25519 public key, unpadded base64url.",
+          "pattern": "^[A-Za-z0-9_-]{43}$"
+        },
+        "nonce_b64url": {
+          "type": "string",
+          "description": "One-use 16-byte handshake nonce, unpadded base64url.",
+          "pattern": "^[A-Za-z0-9_-]{22}$"
+        },
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": [
+        "message_type",
+        "protocol_version",
+        "attempt_id",
+        "role",
+        "ephemeral_public_key_b64url",
+        "nonce_b64url",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "encryptedFrame": {
+      "type": "object",
+      "properties": {
+        "message_type": {"const": "encrypted_frame"},
+        "protocol_version": {"const": 1},
+        "session_id": {"$ref": "#/$defs/uuid"},
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "nonce_b64url": {
+          "type": "string",
+          "description": "Unique 12-byte directional AEAD nonce, unpadded base64url.",
+          "pattern": "^[A-Za-z0-9_-]{16}$"
+        },
+        "ciphertext_b64url": {
+          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "minLength": 22,
+          "maxLength": 49152,
+          "description": "Bounded AEAD ciphertext. Payload kind and contents remain confidential."
+        },
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": [
+        "message_type",
+        "protocol_version",
+        "session_id",
+        "sequence",
+        "nonce_b64url",
+        "ciphertext_b64url",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "sharedAuthStepUpPayload": {
+      "type": "object",
+      "description": "Opaque Shared Auth request relay. Wrapper fields are routing/replay hints only; the receiving app must verify that they match the cryptographically verified Shared Auth request. No factor result returns over proximity.",
+      "properties": {
+        "payload_type": {"const": "shared_auth_step_up"},
+        "exchange_id": {"$ref": "#/$defs/uuid"},
+        "recipient_device_fingerprint": {"$ref": "#/$defs/sha256"},
+        "opaque_request_b64url": {
+          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "minLength": 1,
+          "maxLength": 2731,
+          "description": "At most 2048 decoded bytes. Never a bearer token, OTP, factor proof, approval result, or assurance claim."
+        },
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": [
+        "payload_type",
+        "exchange_id",
+        "recipient_device_fingerprint",
+        "opaque_request_b64url",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "peerInfoOfferPayload": {
+      "type": "object",
+      "description": "One explicitly consented, in-memory peer-information offer. Import requires a separate user review action.",
+      "properties": {
+        "payload_type": {"const": "peer_info_offer"},
+        "transfer_id": {"$ref": "#/$defs/uuid"},
+        "media_type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9!#$&^_.+/-]+$"
+        },
+        "content_size_bytes": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "content_b64url": {
+          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "minLength": 1,
+          "maxLength": 43691
+        },
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": [
+        "payload_type",
+        "transfer_id",
+        "media_type",
+        "content_size_bytes",
+        "content_sha256",
+        "content_b64url",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "updateManifestOfferPayload": {
+      "type": "object",
+      "description": "Signed HTTPS manifest metadata only. Raw applications and silent-install instructions are prohibited from this protocol.",
+      "properties": {
+        "payload_type": {"const": "update_manifest_offer"},
+        "application_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9._-]+$"
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["android", "ios", "linux", "macos", "windows"]
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$",
+          "maxLength": 64
+        },
+        "distribution": {
+          "type": "string",
+          "enum": ["app_store", "testflight", "play_store", "managed_distribution", "direct_signed_package"]
+        },
+        "manifest_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://",
+          "maxLength": 2048
+        },
+        "manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "signature_algorithm": {"const": "ed25519"},
+        "signer_key_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9._-]+$"
+        },
+        "manifest_signature_b64url": {
+          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "minLength": 86,
+          "maxLength": 512
+        },
+        "expires_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "required": [
+        "payload_type",
+        "application_id",
+        "platform",
+        "version",
+        "distribution",
+        "manifest_url",
+        "manifest_sha256",
+        "signature_algorithm",
+        "signer_key_id",
+        "manifest_signature_b64url",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "decryptedPayload": {
+      "oneOf": [
+        {"$ref": "#/$defs/sharedAuthStepUpPayload"},
+        {"$ref": "#/$defs/peerInfoOfferPayload"},
+        {"$ref": "#/$defs/updateManifestOfferPayload"}
+      ]
+    }
+  }
+}

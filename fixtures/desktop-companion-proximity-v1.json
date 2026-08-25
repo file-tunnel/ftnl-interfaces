@@ -1,0 +1,21 @@
+{
+  "contract_version": 1,
+  "change_id": "proximity-v1",
+  "changed_contracts": ["proximity", "desktop_companion"],
+  "implementations": {
+    "rust_desktop": {
+      "repository": "file-tunnel/ftnl-desktop-app.rs",
+      "status": "blocked",
+      "rationale": "The transport contract and defensive validation are ready, but no audited native Bluetooth adapter is wired into the Rust desktop application yet.",
+      "follow_up_issue": "https://github.com/file-tunnel/.github/issues/11",
+      "review_expires_on": "2026-09-30"
+    },
+    "flutter_desktop": {
+      "repository": "file-tunnel/ftnl-flutter",
+      "status": "blocked",
+      "rationale": "The organization does not currently contain this companion repository, so a Flutter radio implementation and conformance evidence cannot yet be supplied.",
+      "follow_up_issue": "https://github.com/file-tunnel/.github/issues/11",
+      "review_expires_on": "2026-09-30"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "message_type": "encrypted_frame",
+  "protocol_version": 1,
+  "session_id": "00000000-0000-4000-8000-000000000010",
+  "sequence": 1,
+  "nonce_b64url": "AAAAAAAAAAAAAAAA",
+  "ciphertext_b64url": "AAAAAAAAAAAAAAAAAAAAAA",
+  "expires_at": "2026-08-24T18:05:00Z"
+}
