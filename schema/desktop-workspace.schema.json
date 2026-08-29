@@ -1,0 +1,509 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://file-tunnel.dev/schema/v1/desktop-workspace.schema.json",
+  "title": "File Tunnel paired desktop workspace contract v1",
+  "description": "Strict local-process contract shared by the Rust and Flutter desktop applications. Clipboard text in these documents is local user content and must never enter remote sync, logs, telemetry, analytics, deep links, or authentication decisions.",
+  "oneOf": [
+    {"$ref": "#/$defs/parityManifest"},
+    {"$ref": "#/$defs/workspaceSnapshot"},
+    {"$ref": "#/$defs/workspaceCommand"},
+    {"$ref": "#/$defs/commandResult"},
+    {"$ref": "#/$defs/commandBatch"}
+  ],
+  "$defs": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "implementation": {
+      "type": "string",
+      "enum": ["rust_desktop", "flutter_desktop"]
+    },
+    "featureId": {
+      "type": "string",
+      "enum": [
+        "clipboard.capture.pause",
+        "clipboard.clear_unpinned",
+        "clipboard.deduplicate",
+        "clipboard.delete",
+        "clipboard.history.text",
+        "clipboard.pin",
+        "clipboard.retention",
+        "clipboard.search",
+        "desktop.tray.lifecycle",
+        "desktop.window.close_to_tray",
+        "desktop.window.regular",
+        "privacy.source_exclusions"
+      ]
+    },
+    "featureSupport": {
+      "oneOf": [
+        {"$ref": "#/$defs/implementedFeature"},
+        {"$ref": "#/$defs/plannedFeature"},
+        {"$ref": "#/$defs/blockedFeature"}
+      ]
+    },
+    "implementedFeature": {
+      "type": "object",
+      "properties": {
+        "feature_id": {"$ref": "#/$defs/featureId"},
+        "status": {"const": "implemented"},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160,
+            "pattern": "^[A-Za-z0-9._/ :-]+$"
+          }
+        }
+      },
+      "required": ["feature_id", "status", "evidence"],
+      "additionalProperties": false
+    },
+    "plannedFeature": {
+      "type": "object",
+      "properties": {
+        "feature_id": {"$ref": "#/$defs/featureId"},
+        "status": {"const": "planned"},
+        "follow_up_issue": {
+          "type": "string",
+          "pattern": "^DEN-[1-9][0-9]*$",
+          "maxLength": 32
+        }
+      },
+      "required": ["feature_id", "status", "follow_up_issue"],
+      "additionalProperties": false
+    },
+    "blockedFeature": {
+      "type": "object",
+      "properties": {
+        "feature_id": {"$ref": "#/$defs/featureId"},
+        "status": {"const": "blocked"},
+        "follow_up_issue": {
+          "type": "string",
+          "pattern": "^DEN-[1-9][0-9]*$",
+          "maxLength": 32
+        },
+        "reason_code": {
+          "type": "string",
+          "enum": [
+            "missing_platform_runner",
+            "missing_platform_permission",
+            "missing_signed_artifact",
+            "upstream_dependency"
+          ]
+        }
+      },
+      "required": ["feature_id", "status", "follow_up_issue", "reason_code"],
+      "additionalProperties": false
+    },
+    "implementationManifest": {
+      "type": "object",
+      "properties": {
+        "implementation": {"$ref": "#/$defs/implementation"},
+        "features": {
+          "type": "array",
+          "minItems": 12,
+          "maxItems": 12,
+          "items": {"$ref": "#/$defs/featureSupport"}
+        }
+      },
+      "required": ["implementation", "features"],
+      "additionalProperties": false
+    },
+    "parityManifest": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "parity_manifest"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "contract_revision": {
+          "type": "string",
+          "pattern": "^DEN-[1-9][0-9]*\\.v[1-9][0-9]*$",
+          "maxLength": 64
+        },
+        "rust_desktop": {"$ref": "#/$defs/implementationManifest"},
+        "flutter_desktop": {"$ref": "#/$defs/implementationManifest"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "contract_revision",
+        "rust_desktop",
+        "flutter_desktop"
+      ],
+      "additionalProperties": false
+    },
+    "captureState": {
+      "type": "string",
+      "enum": ["active", "paused"]
+    },
+    "sourceFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "maxLength": 71
+    },
+    "contentSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "maxLength": 64
+    },
+    "retentionPolicy": {
+      "type": "object",
+      "properties": {
+        "max_items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "max_age_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 365
+        },
+        "deduplicate": {"type": "boolean"}
+      },
+      "required": ["max_items", "max_age_days", "deduplicate"],
+      "additionalProperties": false
+    },
+    "clipboardItem": {
+      "type": "object",
+      "properties": {
+        "item_id": {"type": "string", "format": "uuid"},
+        "content_kind": {"const": "text"},
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 65536
+        },
+        "content_sha256": {"$ref": "#/$defs/contentSha256"},
+        "byte_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "captured_at": {"type": "string", "format": "date-time"},
+        "is_pinned": {"type": "boolean"},
+        "source_fingerprint": {"$ref": "#/$defs/sourceFingerprint"}
+      },
+      "required": [
+        "item_id",
+        "content_kind",
+        "text",
+        "content_sha256",
+        "byte_size",
+        "captured_at",
+        "is_pinned"
+      ],
+      "additionalProperties": false
+    },
+    "workspaceSnapshot": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "workspace_snapshot"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "capture_state": {"$ref": "#/$defs/captureState"},
+        "retention": {"$ref": "#/$defs/retentionPolicy"},
+        "search_query": {
+          "type": "string",
+          "maxLength": 256
+        },
+        "excluded_source_fingerprints": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/sourceFingerprint"}
+        },
+        "items": {
+          "type": "array",
+          "maxItems": 500,
+          "items": {"$ref": "#/$defs/clipboardItem"}
+        }
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "revision",
+        "capture_state",
+        "retention",
+        "search_query",
+        "excluded_source_fingerprints",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "commandId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "expectedRevision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "pauseCaptureCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {"const": "pause_capture"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type"
+      ],
+      "additionalProperties": false
+    },
+    "resumeCaptureCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {"const": "resume_capture"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type"
+      ],
+      "additionalProperties": false
+    },
+    "setSearchCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {"const": "set_search"},
+        "query": {"type": "string", "maxLength": 256}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type",
+        "query"
+      ],
+      "additionalProperties": false
+    },
+    "itemCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {
+          "type": "string",
+          "enum": ["pin_item", "unpin_item", "delete_item"]
+        },
+        "item_id": {"type": "string", "format": "uuid"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type",
+        "item_id"
+      ],
+      "additionalProperties": false
+    },
+    "clearUnpinnedCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {"const": "clear_unpinned"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type"
+      ],
+      "additionalProperties": false
+    },
+    "setRetentionCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {"const": "set_retention"},
+        "retention": {"$ref": "#/$defs/retentionPolicy"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type",
+        "retention"
+      ],
+      "additionalProperties": false
+    },
+    "setSourceExclusionsCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {"const": "set_source_exclusions"},
+        "source_fingerprints": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/sourceFingerprint"}
+        }
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type",
+        "source_fingerprints"
+      ],
+      "additionalProperties": false
+    },
+    "ingestTextCommand": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "expected_revision": {"$ref": "#/$defs/expectedRevision"},
+        "command_type": {"const": "ingest_text"},
+        "item_id": {"type": "string", "format": "uuid"},
+        "text": {"type": "string", "minLength": 1, "maxLength": 65536},
+        "content_sha256": {"$ref": "#/$defs/contentSha256"},
+        "byte_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "captured_at": {"type": "string", "format": "date-time"},
+        "source_fingerprint": {"$ref": "#/$defs/sourceFingerprint"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "expected_revision",
+        "command_type",
+        "item_id",
+        "text",
+        "content_sha256",
+        "byte_size",
+        "captured_at"
+      ],
+      "additionalProperties": false
+    },
+    "workspaceCommand": {
+      "oneOf": [
+        {"$ref": "#/$defs/pauseCaptureCommand"},
+        {"$ref": "#/$defs/resumeCaptureCommand"},
+        {"$ref": "#/$defs/setSearchCommand"},
+        {"$ref": "#/$defs/itemCommand"},
+        {"$ref": "#/$defs/clearUnpinnedCommand"},
+        {"$ref": "#/$defs/setRetentionCommand"},
+        {"$ref": "#/$defs/setSourceExclusionsCommand"},
+        {"$ref": "#/$defs/ingestTextCommand"}
+      ]
+    },
+    "commandBatch": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command_batch"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "commands": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {"$ref": "#/$defs/workspaceCommand"}
+        }
+      },
+      "required": ["document_type", "schema_version", "commands"],
+      "additionalProperties": false
+    },
+    "successResult": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command_result"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "status": {"const": "applied"},
+        "state": {"$ref": "#/$defs/workspaceSnapshot"}
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "status",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "failureResult": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "command_result"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "command_id": {"$ref": "#/$defs/commandId"},
+        "status": {"const": "rejected"},
+        "current_revision": {"$ref": "#/$defs/expectedRevision"},
+        "error_code": {
+          "type": "string",
+          "enum": [
+            "capture_paused",
+            "duplicate_command",
+            "excluded_source",
+            "invalid_content_hash",
+            "item_not_found",
+            "revision_conflict",
+            "unsupported_command"
+          ]
+        }
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "command_id",
+        "status",
+        "current_revision",
+        "error_code"
+      ],
+      "additionalProperties": false
+    },
+    "commandResult": {
+      "oneOf": [
+        {"$ref": "#/$defs/successResult"},
+        {"$ref": "#/$defs/failureResult"}
+      ]
+    }
+  }
+}

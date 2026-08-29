@@ -1,14 +1,25 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
+import Ajv2020 from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
 
 const readJson = async (path) =>
   JSON.parse(await readFile(new URL(`../${path}`, import.meta.url), "utf8"));
 
 test("schemas are Draft 2020-12 and prohibit unknown contract fields", async () => {
-  for (const name of ["tunnel", "events", "proximity", "desktop-companion"]) {
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  for (const name of [
+    "tunnel",
+    "events",
+    "proximity",
+    "desktop-companion",
+    "desktop-workspace",
+  ]) {
     const schema = await readJson(`schema/${name}.schema.json`);
     assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
+    assert.doesNotThrow(() => ajv.compile(schema), `${name} schema must compile`);
 
     for (const definition of Object.values(schema.$defs ?? {})) {
       if (definition.type === "object") {
@@ -19,6 +30,67 @@ test("schemas are Draft 2020-12 and prohibit unknown contract fields", async () 
   const tunnel = await readJson("schema/tunnel.schema.json");
   assert.equal(tunnel.$defs.createTunnelRequest.additionalProperties, false);
   assert.equal(tunnel.$defs.createTunnelResponse.additionalProperties, false);
+});
+
+test("legacy proximity and desktop companion fixtures remain valid", async () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  for (const [schemaName, fixtureName] of [
+    ["proximity", "proximity-frame"],
+    ["desktop-companion", "desktop-companion-proximity-v1"],
+  ]) {
+    const schema = await readJson(`schema/${schemaName}.schema.json`);
+    const fixture = await readJson(`fixtures/${fixtureName}.json`);
+    const validate = ajv.compile(schema);
+    assert.equal(
+      validate(fixture),
+      true,
+      `${fixtureName} must satisfy ${schemaName}: ${JSON.stringify(validate.errors)}`,
+    );
+  }
+});
+
+test("desktop workspace accepts canonical documents and rejects negative vectors", async () => {
+  const schema = await readJson("schema/desktop-workspace.schema.json");
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  const validate = ajv.compile(schema);
+
+  for (const fixture of [
+    "desktop-workspace-parity-v1",
+    "desktop-workspace-snapshot-v1",
+    "desktop-workspace-commands-v1",
+  ]) {
+    const document = await readJson(`fixtures/${fixture}.json`);
+    assert.equal(
+      validate(document),
+      true,
+      `${fixture} must satisfy the canonical schema: ${JSON.stringify(validate.errors)}`,
+    );
+  }
+
+  const invalid = await readJson("fixtures/desktop-workspace-invalid-v1.json");
+  assert.ok(invalid.length >= 5);
+  for (const vector of invalid) {
+    assert.equal(validate(vector.document), false, vector.name);
+  }
+});
+
+test("desktop feature manifests are complete, ordered, unique, and semantically equal", async () => {
+  const manifest = await readJson("fixtures/desktop-workspace-parity-v1.json");
+  const rust = manifest.rust_desktop.features.map(({ feature_id, status }) => ({
+    feature_id,
+    status,
+  }));
+  const flutter = manifest.flutter_desktop.features.map(
+    ({ feature_id, status }) => ({ feature_id, status }),
+  );
+  const ids = rust.map(({ feature_id }) => feature_id);
+
+  assert.deepEqual(rust, flutter);
+  assert.deepEqual(ids, [...ids].sort());
+  assert.equal(new Set(ids).size, ids.length);
+  assert.equal(ids.length, 12);
 });
 
 test("proximity keeps identity proofs and update binaries off the radio", async () => {

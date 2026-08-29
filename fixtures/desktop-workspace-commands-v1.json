@@ -1,0 +1,77 @@
+{
+  "document_type": "command_batch",
+  "schema_version": 1,
+  "commands": [
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847101",
+      "expected_revision": 3,
+      "command_type": "pause_capture"
+    },
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847102",
+      "expected_revision": 4,
+      "command_type": "resume_capture"
+    },
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847103",
+      "expected_revision": 5,
+      "command_type": "ingest_text",
+      "item_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847011",
+      "text": "Second synthetic clip",
+      "content_sha256": "5a44ea5f690cb341495c6d6759708abd421751b8c8c6e5887f29ccd98b7a2978",
+      "byte_size": 21,
+      "captured_at": "2026-08-29T12:01:00Z"
+    },
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847104",
+      "expected_revision": 6,
+      "command_type": "set_search",
+      "query": "second"
+    },
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847105",
+      "expected_revision": 7,
+      "command_type": "pin_item",
+      "item_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847011"
+    },
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847106",
+      "expected_revision": 8,
+      "command_type": "set_retention",
+      "retention": {
+        "max_items": 100,
+        "max_age_days": 14,
+        "deduplicate": true
+      }
+    },
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847107",
+      "expected_revision": 9,
+      "command_type": "set_source_exclusions",
+      "source_fingerprints": [
+        "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+      ]
+    },
+    {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847108",
+      "expected_revision": 10,
+      "command_type": "clear_unpinned"
+    }
+  ]
+}
