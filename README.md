@@ -28,10 +28,35 @@ in the URL fragment (`#c=...`), which browsers do not send in HTTP requests.
 Tunnel identifiers are routing identifiers, not credentials. Possession of a
 UUID alone grants no access.
 
+## Proximity and desktop parity
+
+`schema/proximity.schema.json` defines a transport-neutral Bluetooth/Nearby
+contract. Discovery identifiers and X25519 keys are ephemeral, the user verifies
+a short authentication string, and application payloads travel only in bounded,
+ordered AEAD frames. Bluetooth proximity, RSSI, and OS pairing are transport
+evidence rather than identity or authentication assurance.
+
+The Shared Auth payload carries one opaque, single-use step-up request bound by
+Shared Auth to its issuer, audience, recipient, and expiry. Passwords, OTPs,
+factor proofs, bearer tokens, approval results, and assurance claims do not
+travel over proximity; the relying application obtains and verifies the result
+over its normal authenticated channel. Peer information requires explicit
+review before import. Update offers contain signed HTTPS manifest metadata only,
+including App Store and TestFlight distribution hints, never raw application
+binaries or silent-install instructions.
+
+`schema/desktop-companion.schema.json` requires every shared desktop contract
+change to record evidence for both Rust and Flutter. A side may be marked
+`not_affected` or `blocked` only with a rationale and expiring review date;
+blocked work also requires a GitHub issue. The current proximity parity record
+is `fixtures/desktop-companion-proximity-v1.json`.
+
 ## Versioning rules
 
-- Additive fields are allowed within `v1`.
-- Clients must ignore unknown object fields and event kinds.
+- Additive fields are allowed within `v1` only after schemas, fixtures, and all
+  generated bindings are updated together.
+- Runtime objects are closed and reject unknown fields; event `kind` values
+  remain forward-compatible strings.
 - Removing or changing field meaning requires a new API version.
 - Capabilities, pairing secrets, and event tickets are never logged or placed
   in analytics payloads.
