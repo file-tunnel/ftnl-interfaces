@@ -1,0 +1,26 @@
+{
+  "document_type": "workspace_snapshot",
+  "schema_version": 1,
+  "revision": 3,
+  "capture_state": "active",
+  "retention": {
+    "max_items": 250,
+    "max_age_days": 30,
+    "deduplicate": true
+  },
+  "search_query": "synthetic",
+  "excluded_source_fingerprints": [
+    "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  ],
+  "items": [
+    {
+      "item_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847010",
+      "content_kind": "text",
+      "text": "Synthetic clipboard fixture",
+      "content_sha256": "eaa0a225201f59c7b294bf33e85da4720ec9993d0e4ada75389f6f50b65957d1",
+      "byte_size": 27,
+      "captured_at": "2026-08-29T12:00:00Z",
+      "is_pinned": true
+    }
+  ]
+}

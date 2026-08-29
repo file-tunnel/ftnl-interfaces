@@ -12,6 +12,19 @@ UI components, and SDKs.
 - `fixtures/` contains cross-language contract vectors.
 - `generated/` contains reviewable Rust, TypeScript, Dart, and Gleam snapshots.
 
+`schema/desktop-workspace.schema.json` is the local-process contract shared by
+the Rust and Flutter desktop companions. It defines the paired feature
+manifest, bounded clipboard workspace snapshot, optimistic-revision commands,
+and safe result codes. The matching fixtures include both accepted documents
+and negative vectors; runtime validation and a semantic parity check ensure the
+two desktop feature manifests remain complete, ordered, unique, and equal.
+
+Clipboard text in that contract is local user content, not a wire or sync
+payload. It must not enter File Tunnel requests, logs, telemetry, analytics,
+deep links, fixtures derived from real users, or Shared Auth decisions. Source
+exclusions use SHA-256 fingerprints so raw application identifiers do not need
+to cross component boundaries.
+
 The initial API is deliberately capability-based. A desktop capability can
 observe and download from one tunnel; a phone capability can declare and upload
 files to that tunnel. Pairing secrets are one-time credentials and should live

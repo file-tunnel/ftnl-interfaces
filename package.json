@@ -6,6 +6,10 @@
   "scripts": {
     "test": "node --test scripts/contract.test.mjs"
   },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  },
   "license": "MIT",
   "engines": {
     "node": ">=22"
