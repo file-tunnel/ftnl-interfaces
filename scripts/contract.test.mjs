@@ -8,6 +8,8 @@ const readJson = async (path) =>
   JSON.parse(await readFile(new URL(`../${path}`, import.meta.url), "utf8"));
 
 test("schemas are Draft 2020-12 and prohibit unknown contract fields", async () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
   for (const name of [
     "tunnel",
     "events",
@@ -17,6 +19,7 @@ test("schemas are Draft 2020-12 and prohibit unknown contract fields", async () 
   ]) {
     const schema = await readJson(`schema/${name}.schema.json`);
     assert.equal(schema.$schema, "https://json-schema.org/draft/2020-12/schema");
+    assert.doesNotThrow(() => ajv.compile(schema), `${name} schema must compile`);
 
     for (const definition of Object.values(schema.$defs ?? {})) {
       if (definition.type === "object") {
@@ -27,6 +30,24 @@ test("schemas are Draft 2020-12 and prohibit unknown contract fields", async () 
   const tunnel = await readJson("schema/tunnel.schema.json");
   assert.equal(tunnel.$defs.createTunnelRequest.additionalProperties, false);
   assert.equal(tunnel.$defs.createTunnelResponse.additionalProperties, false);
+});
+
+test("legacy proximity and desktop companion fixtures remain valid", async () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  for (const [schemaName, fixtureName] of [
+    ["proximity", "proximity-frame"],
+    ["desktop-companion", "desktop-companion-proximity-v1"],
+  ]) {
+    const schema = await readJson(`schema/${schemaName}.schema.json`);
+    const fixture = await readJson(`fixtures/${fixtureName}.json`);
+    const validate = ajv.compile(schema);
+    assert.equal(
+      validate(fixture),
+      true,
+      `${fixtureName} must satisfy ${schemaName}: ${JSON.stringify(validate.errors)}`,
+    );
+  }
 });
 
 test("desktop workspace accepts canonical documents and rejects negative vectors", async () => {

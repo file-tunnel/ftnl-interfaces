@@ -22,22 +22,6 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm test
-      - name: Compile JSON Schema
-        run: |
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/tunnel.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/events.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/proximity.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/desktop-companion.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv test \
-            --spec=draft2020 -c ajv-formats -s schema/proximity.schema.json \
-            -d fixtures/proximity-frame.json --valid
-          npx --yes --package ajv-cli --package ajv-formats ajv test \
-            --spec=draft2020 -c ajv-formats -s schema/desktop-companion.schema.json \
-            -d fixtures/desktop-companion-proximity-v1.json --valid
   generated:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
