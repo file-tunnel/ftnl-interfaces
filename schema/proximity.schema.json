@@ -88,7 +88,8 @@
           "pattern": "^[A-Za-z0-9_-]{16}$"
         },
         "ciphertext_b64url": {
-          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$",
           "minLength": 22,
           "maxLength": 49152,
           "description": "Bounded AEAD ciphertext. Payload kind and contents remain confidential."
@@ -114,7 +115,8 @@
         "exchange_id": {"$ref": "#/$defs/uuid"},
         "recipient_device_fingerprint": {"$ref": "#/$defs/sha256"},
         "opaque_request_b64url": {
-          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$",
           "minLength": 1,
           "maxLength": 2731,
           "description": "At most 2048 decoded bytes. Never a bearer token, OTP, factor proof, approval result, or assurance claim."
@@ -145,7 +147,8 @@
         "content_size_bytes": {"type": "integer", "minimum": 1, "maximum": 32768},
         "content_sha256": {"$ref": "#/$defs/sha256"},
         "content_b64url": {
-          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$",
           "minLength": 1,
           "maxLength": 43691
         },
@@ -201,7 +204,8 @@
           "pattern": "^[A-Za-z0-9._-]+$"
         },
         "manifest_signature_b64url": {
-          "allOf": [{"$ref": "#/$defs/base64url"}],
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$",
           "minLength": 86,
           "maxLength": 512
         },

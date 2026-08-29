@@ -12,3 +12,21 @@ pub fn fragment_secret_test() {
   )
   |> should.equal(Ok("secret"))
 }
+
+pub fn proximity_payload_type_test() {
+  let payload =
+    ftnl_interfaces.SharedAuthStepUpPayload(
+      exchange_id: "00000000-0000-4000-8000-000000000011",
+      recipient_device_fingerprint: "fingerprint",
+      opaque_request_b64url: "opaque",
+      expires_at: "2026-08-24T18:05:00Z",
+    )
+
+  payload
+  |> should.equal(ftnl_interfaces.SharedAuthStepUpPayload(
+    exchange_id: "00000000-0000-4000-8000-000000000011",
+    recipient_device_fingerprint: "fingerprint",
+    opaque_request_b64url: "opaque",
+    expires_at: "2026-08-24T18:05:00Z",
+  ))
+}
