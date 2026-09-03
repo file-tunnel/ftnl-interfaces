@@ -1,0 +1,14 @@
+[package]
+org = "file-tunnel"
+name = "ftnl-public-validation-contracts"
+version = "0.1.0"
+description = "Public peer validation authorities for file-tunnel"
+license = "MIT"
+
+[targets.json-schema]
+dir = "."
+adapter = "none"
+
+[targets.typespec]
+dir = "typespec"
+adapter = "none"
