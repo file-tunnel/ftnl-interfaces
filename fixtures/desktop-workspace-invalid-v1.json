@@ -1,0 +1,61 @@
+[
+  {
+    "name": "unknown command fields fail closed",
+    "document": {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847201",
+      "expected_revision": 0,
+      "command_type": "pause_capture",
+      "authorization": "forbidden"
+    }
+  },
+  {
+    "name": "item commands require an item identifier",
+    "document": {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847202",
+      "expected_revision": 0,
+      "command_type": "delete_item"
+    }
+  },
+  {
+    "name": "search input is bounded",
+    "document": {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847203",
+      "expected_revision": 0,
+      "command_type": "set_search",
+      "query": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  {
+    "name": "source exclusions cannot disclose raw application identifiers",
+    "document": {
+      "document_type": "command",
+      "schema_version": 1,
+      "command_id": "018f47d2-2d9f-7a41-a2aa-1aef7d847204",
+      "expected_revision": 0,
+      "command_type": "set_source_exclusions",
+      "source_fingerprints": ["com.example.private-application"]
+    }
+  },
+  {
+    "name": "both implementations must account for every baseline feature",
+    "document": {
+      "document_type": "parity_manifest",
+      "schema_version": 1,
+      "contract_revision": "DEN-3384.v1",
+      "rust_desktop": {
+        "implementation": "rust_desktop",
+        "features": []
+      },
+      "flutter_desktop": {
+        "implementation": "flutter_desktop",
+        "features": []
+      }
+    }
+  }
+]

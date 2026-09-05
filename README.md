@@ -9,8 +9,35 @@ UI components, and SDKs.
 - `openapi/ftnl.openapi.yaml` defines the HTTP control and data plane.
 - `asyncapi/ftnl.asyncapi.yaml` defines the realtime event stream.
 - `schema/*.schema.json` defines runtime-validatable payloads.
+- `validation/**/*.json` and `validation/**/*.tsp` are independent, peer JSON
+  Schema and TypeSpec authorities; semantic disagreement blocks generation.
+- `protobuf/*.proto` defines binary runtime envelopes with machine-readable
+  validation options and stable field numbers.
 - `fixtures/` contains cross-language contract vectors.
-- `generated/` contains reviewable Rust, TypeScript, Dart, and Gleam snapshots.
+- `generated/` contains reviewable Rust, TypeScript, Go, Dart, and Gleam
+  snapshots emitted only after authority agreement.
+
+`schema/desktop-workspace.schema.json` is the local-process contract shared by
+the Rust and Flutter desktop companions. It defines the paired feature
+manifest, bounded clipboard workspace snapshot, optimistic-revision commands,
+and safe result codes. The matching fixtures include both accepted documents
+and negative vectors; runtime validation and a semantic parity check ensure the
+two desktop feature manifests remain complete, ordered, unique, and equal.
+
+Clipboard text in that contract is local user content, not a wire or sync
+payload. It must not enter File Tunnel requests, logs, telemetry, analytics,
+deep links, fixtures derived from real users, or Shared Auth decisions. Source
+exclusions use SHA-256 fingerprints so raw application identifiers do not need
+to cross component boundaries.
+
+The paired desktop implementations also expose a `proximity.secure_session`
+capability: an ephemeral X25519 handshake, transcript-bound HKDF-SHA256 key
+schedule, explicit six-digit SAS confirmation, and directional
+ChaCha20-Poly1305 frames. The layer carries only opaque Shared Auth step-up,
+consented peer-information, or signed update-manifest payloads. It treats
+Bluetooth as an untrusted bearer; native adapters, permissions, background
+pairing, and unattended updates remain disabled until they pass the adapter
+acceptance gate in the companion contract fixture.
 
 The initial API is deliberately capability-based. A desktop capability can
 observe and download from one tunnel; a phone capability can declare and upload
@@ -51,6 +78,21 @@ change to record evidence for both Rust and Flutter. A side may be marked
 blocked work also requires a GitHub issue. The current proximity parity record
 is `fixtures/desktop-companion-proximity-v1.json`.
 
+## Asynchronous worker contracts
+
+The private server scope defines bounded worker jobs and receipts for file and
+image processing, embedding batches, regressions, and correlation discovery.
+Its TypeSpec and JSON Schema authorities generate isolated server-only Rust,
+TypeScript, Go, and Gleam definitions. Browser and edge entrypoints cannot
+export this scope.
+
+`protobuf/file_tunnel_worker.proto` supplies the corresponding binary runtime
+envelope and validation-rule descriptors. Runtime adapters must validate the
+generated structural contract before mapping into `ftnl-lambdas`; that worker
+core separately enforces cross-field semantics such as exact Shared Auth
+service audience, product authorization, operation-specific workload bounds,
+deadline ordering, object-handle safety, and input/output separation.
+
 ## Versioning rules
 
 - Additive fields are allowed within `v1` only after schemas, fixtures, and all
@@ -69,8 +111,9 @@ is `fixtures/desktop-companion-proximity-v1.json`.
 nix develop --command agent-check
 ```
 
-The checked-in Nix lock pins Node.js, Rust, Dart, Gleam, Erlang, and repository
-linting tools so generated bindings can be checked from one shell.
+The checked-in Nix lock pins Node.js, TypeSpec, Protobuf, Rust, Dart, Gleam,
+Erlang, and repository linting tools so generated bindings can be checked from
+one shell.
 OpenAPI and AsyncAPI include machine-readable pointers to the owning executable
 models; [`docs/formal-methods.md`](docs/formal-methods.md) maps each contract
 obligation to its proof and implementation check.

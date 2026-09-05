@@ -20,30 +20,18 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
+      - uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0
+        with:
+          version: "36.1"
+      - run: npm ci
       - run: npm test
-      - name: Compile JSON Schema
-        run: |
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/tunnel.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/events.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/proximity.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv compile \
-            --spec=draft2020 -c ajv-formats -s schema/desktop-companion.schema.json
-          npx --yes --package ajv-cli --package ajv-formats ajv test \
-            --spec=draft2020 -c ajv-formats -s schema/proximity.schema.json \
-            -d fixtures/proximity-frame.json --valid
-          npx --yes --package ajv-cli --package ajv-formats ajv test \
-            --spec=draft2020 -c ajv-formats -s schema/desktop-companion.schema.json \
-            -d fixtures/desktop-companion-proximity-v1.json --valid
   generated:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
-        target: [rust, typescript, dart, gleam]
+        target: [rust, typescript, dart, gleam, go]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -56,7 +44,7 @@ jobs:
         if: matrix.target == 'typescript'
         with:
           node-version: 22
-      - uses: dart-lang/setup-dart@7654d458321ee25acccccfdb86cd48bd95768ff1 # v1.8.0
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         if: matrix.target == 'dart'
       - uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
         if: matrix.target == 'gleam'
@@ -64,17 +52,33 @@ jobs:
           otp-version: "28"
           gleam-version: "1.16.0"
           rebar3-version: "3"
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        if: matrix.target == 'go'
+        with:
+          go-version: "1.27.1"
       - if: matrix.target == 'rust'
         run: |
           cargo fmt --manifest-path generated/rust/Cargo.toml --check
           cargo clippy --locked --manifest-path generated/rust/Cargo.toml --all-targets -- -D warnings
           cargo test --locked --manifest-path generated/rust/Cargo.toml
+          rustfmt --edition 2024 --check generated/final/rust/isomorphic/src/lib.rs generated/final/rust/server/src/lib.rs
+          rustc --crate-name ftnl_validation_isomorphic --crate-type lib --edition 2024 generated/final/rust/isomorphic/src/lib.rs -o /tmp/ftnl-validation-isomorphic.rlib
+          rustc --crate-name ftnl_validation_server --crate-type lib --edition 2024 generated/final/rust/server/src/lib.rs -o /tmp/ftnl-validation-server.rlib
       - if: matrix.target == 'typescript'
         working-directory: generated/typescript
-        run: npm ci && npm test
+        run: |
+          npm ci
+          npm test
+          ./node_modules/.bin/tsc --ignoreConfig --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeNext ../final/typescript/isomorphic/types.ts ../final/typescript/server/types.ts ../final/typescript/runtime/browser/index.ts ../final/typescript/runtime/node/index.ts ../final/typescript/runtime/deno/index.ts ../final/typescript/runtime/bun/index.ts ../final/typescript/runtime/edge/index.ts
       - if: matrix.target == 'dart'
         working-directory: generated/dart
         run: dart pub get && dart format --output=none --set-exit-if-changed . && dart analyze && dart test
       - if: matrix.target == 'gleam'
         working-directory: generated/gleam
         run: gleam format --check src test && gleam deps download && gleam test
+      - if: matrix.target == 'gleam'
+        run: gleam format --check generated/final/gleam/isomorphic/src/ftnl_validation_interfaces_isomorphic.gleam generated/final/gleam/server/src/ftnl_validation_interfaces_server.gleam
+      - if: matrix.target == 'go'
+        run: |
+          test -z "$(gofmt -d generated/final/golang/isomorphic/types.go generated/final/golang/server/types.go)"
+          GO111MODULE=off go test ./generated/final/golang/isomorphic ./generated/final/golang/server

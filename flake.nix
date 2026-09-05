@@ -21,6 +21,7 @@
             pkgs.bash
             pkgs.coreutils
             pkgs.git
+            pkgs.protobuf
           ];
           text = builtins.readFile ./.nix/agent-check.sh;
         };

@@ -54,3 +54,23 @@ you are committing a regeneration, the pre-commit guard needs to be told so:
 ```sh
 REGEN=1 git commit -m "Regenerate clients from the updated route map"
 ```
+
+## Gitignored trees and runtime contract
+
+If `generated/` is in `.gitignore`, generated artifacts stay off VCS. Still
+commit this `README.md` (`git add -f generated/README.md`) or add a `.gitignore`
+exception so the freeze policy remains visible:
+
+```
+generated/**
+!generated/README.md
+```
+
+TypeSpec and JSON Schema remain independent human-authored authorities; neither
+may be generated from the other. Run the pinned semantic parity gate before it
+writes a final artifact. Unit tests validate fixtures and examples against Draft
+2020-12 at runtime: valid documents must pass and adversarial vectors must fail.
+TypeSpec compiles with warnings as errors, Protobuf compiles to a descriptor set,
+and generated language targets must format and compile independently. Cross-field
+semantic checks remain mandatory where structural formats cannot express an
+invariant.

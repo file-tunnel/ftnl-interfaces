@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/file-tunnel/ftnl-interfaces/validation/authorities/server/contracts.json",
+  "title": "File Tunnel private worker contracts",
+  "contractVersion": "file-tunnel.worker/v1",
+  "visibility": "server",
+  "type": "object",
+  "oneOf": [
+    {"$ref": "#/$defs/WorkerJob"},
+    {"$ref": "#/$defs/WorkerReceipt"}
+  ],
+  "$defs": {
+    "WorkerProductScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope_kind", "scope_id"],
+      "properties": {
+        "scope_kind": {
+          "type": "string",
+          "pattern": "^individual$|^organization$"
+        },
+        "scope_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        }
+      }
+    },
+    "WorkerWorkload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_count"],
+      "properties": {
+        "item_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "vector_dimensions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        }
+      }
+    },
+    "WorkerObjectRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "store_id",
+        "object_id",
+        "version",
+        "content_digest",
+        "expected_bytes"
+      ],
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "object_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "content_digest": {
+          "type": "string",
+          "pattern": "^sha256\\x3a[0-9a-f]{64}$"
+        },
+        "expected_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483648
+        }
+      }
+    },
+    "WorkerObjectTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["store_id", "object_id", "version"],
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "object_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        }
+      }
+    },
+    "WorkerJob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol",
+        "job_id",
+        "idempotency_key",
+        "product_scope",
+        "kind",
+        "workload",
+        "input",
+        "output",
+        "submitted_at_unix",
+        "deadline_unix",
+        "max_output_bytes"
+      ],
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "pattern": "^file-tunnel\\.worker/v1$"
+        },
+        "job_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "product_scope": {"$ref": "#/$defs/WorkerProductScope"},
+        "kind": {
+          "type": "string",
+          "pattern": "^file_metadata$|^image_metadata$|^image_thumbnail$|^image_transcode$|^embedding_batch$|^regression_batch$|^correlation_discovery$"
+        },
+        "workload": {"$ref": "#/$defs/WorkerWorkload"},
+        "input": {"$ref": "#/$defs/WorkerObjectRef"},
+        "output": {"$ref": "#/$defs/WorkerObjectTarget"},
+        "submitted_at_unix": {"type": "integer", "minimum": 0},
+        "deadline_unix": {"type": "integer", "minimum": 1},
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 536870912
+        }
+      }
+    },
+    "WorkerReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "job_id", "status", "code"],
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "pattern": "^file-tunnel\\.worker/v1$"
+        },
+        "job_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "status": {
+          "type": "string",
+          "pattern": "^completed$|^retryable_failure$|^terminal_failure$"
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "output_digest": {
+          "type": "string",
+          "pattern": "^sha256\\x3a[0-9a-f]{64}$"
+        },
+        "bytes_written": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 536870912
+        }
+      }
+    }
+  }
+}
