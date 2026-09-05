@@ -11,11 +11,13 @@ pkgs.mkShell {
     beam28Packages.erlang
     git
     gleam
+    go
     jq
     nixfmt
     nodejs_22
     openssl
     pkg-config
+    protobuf
     beam28Packages.rebar3
     ripgrep
     rust-analyzer

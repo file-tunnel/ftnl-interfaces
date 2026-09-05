@@ -36,7 +36,14 @@
       }
     },
     "server": {
-      "models": [],
+      "models": [
+        "WorkerProductScope",
+        "WorkerWorkload",
+        "WorkerObjectRef",
+        "WorkerObjectTarget",
+        "WorkerJob",
+        "WorkerReceipt"
+      ],
       "authorities": {
         "jsonSchema": "validation/authorities/server/contracts.json",
         "typespec": "validation/authorities/server/contracts.tsp"

@@ -1,0 +1,206 @@
+{
+  "models": {
+    "WorkerJob": {
+      "closed": true,
+      "fields": {
+        "deadline_unix": {
+          "kind": "integer",
+          "minimum": 1,
+          "required": true
+        },
+        "idempotency_key": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "input": {
+          "kind": "ref",
+          "ref": "WorkerObjectRef",
+          "required": true
+        },
+        "job_id": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "kind": {
+          "kind": "string",
+          "pattern": "^file_metadata$|^image_metadata$|^image_thumbnail$|^image_transcode$|^embedding_batch$|^regression_batch$|^correlation_discovery$",
+          "required": true
+        },
+        "max_output_bytes": {
+          "kind": "integer",
+          "maximum": 536870912,
+          "minimum": 1,
+          "required": true
+        },
+        "output": {
+          "kind": "ref",
+          "ref": "WorkerObjectTarget",
+          "required": true
+        },
+        "product_scope": {
+          "kind": "ref",
+          "ref": "WorkerProductScope",
+          "required": true
+        },
+        "protocol": {
+          "kind": "string",
+          "pattern": "^file-tunnel\\.worker/v1$",
+          "required": true
+        },
+        "submitted_at_unix": {
+          "kind": "integer",
+          "minimum": 0,
+          "required": true
+        },
+        "workload": {
+          "kind": "ref",
+          "ref": "WorkerWorkload",
+          "required": true
+        }
+      }
+    },
+    "WorkerObjectRef": {
+      "closed": true,
+      "fields": {
+        "content_digest": {
+          "kind": "string",
+          "pattern": "^sha256\\x3a[0-9a-f]{64}$",
+          "required": true
+        },
+        "expected_bytes": {
+          "kind": "integer",
+          "maximum": 2147483648,
+          "minimum": 1,
+          "required": true
+        },
+        "object_id": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "store_id": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "version": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        }
+      }
+    },
+    "WorkerObjectTarget": {
+      "closed": true,
+      "fields": {
+        "object_id": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "store_id": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "version": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        }
+      }
+    },
+    "WorkerProductScope": {
+      "closed": true,
+      "fields": {
+        "scope_id": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "scope_kind": {
+          "kind": "string",
+          "pattern": "^individual$|^organization$",
+          "required": true
+        }
+      }
+    },
+    "WorkerReceipt": {
+      "closed": true,
+      "fields": {
+        "bytes_written": {
+          "kind": "integer",
+          "maximum": 536870912,
+          "minimum": 1,
+          "required": false
+        },
+        "code": {
+          "kind": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "required": true
+        },
+        "job_id": {
+          "kind": "string",
+          "maxLength": 256,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "required": true
+        },
+        "output_digest": {
+          "kind": "string",
+          "pattern": "^sha256\\x3a[0-9a-f]{64}$",
+          "required": false
+        },
+        "protocol": {
+          "kind": "string",
+          "pattern": "^file-tunnel\\.worker/v1$",
+          "required": true
+        },
+        "status": {
+          "kind": "string",
+          "pattern": "^completed$|^retryable_failure$|^terminal_failure$",
+          "required": true
+        }
+      }
+    },
+    "WorkerWorkload": {
+      "closed": true,
+      "fields": {
+        "item_count": {
+          "kind": "integer",
+          "maximum": 100000,
+          "minimum": 1,
+          "required": true
+        },
+        "vector_dimensions": {
+          "kind": "integer",
+          "maximum": 4096,
+          "minimum": 1,
+          "required": false
+        }
+      }
+    }
+  }
+}

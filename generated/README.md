@@ -20,9 +20,11 @@ writable until you re-freeze:
 find generated -type f ! -name 'README.md' ! -name 'readme.md' -exec chmod a-w {} +
 ```
 
-To regenerate, change the **primary source** (`.cli-flags.toml`, route map, OpenAPI,
-`schema/*.schema.json`, …) and re-run the generator. Preferred generators thaw,
-write, then `chmod a-w` themselves.
+To regenerate, edit every applicable peer authority independently. In
+particular, TypeSpec and JSON Schema are both human-authored sources; neither
+may be generated from the other. Run the pinned semantic parity gate before it
+writes a final artifact. Preferred generators thaw, write, then `chmod a-w`
+themselves.
 
 ## Gitignored trees
 
@@ -37,7 +39,8 @@ generated/**
 
 ## Runtime contract (not just compile-time)
 
-JSON Schema is a **cross-check**, not always the primary generator input. Unit tests
-should validate fixtures/examples against Draft 2020-12 at runtime (valid must pass,
-invalid must fail) and compare schema keys to `.cli-flags.toml` env names or
-route-map keys when those exist.
+Unit tests validate fixtures and examples against Draft 2020-12 at runtime:
+valid documents must pass and adversarial vectors must fail. TypeSpec compiles
+with warnings as errors, Protobuf compiles to a descriptor set, and generated
+language targets must format and compile independently. Cross-field semantic
+checks remain mandatory where structural formats cannot express an invariant.

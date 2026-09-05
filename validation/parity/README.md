@@ -14,6 +14,11 @@ TypeSpec and JSON Schema/OpenAPI are independent, peer, human-authored authoriti
 
 Every model belongs to exactly one scope. `isomorphic` is safe everywhere; `client` is client-only; `edge` is edge-only; `server` is private/server-only. New non-isomorphic sources belong under `validation/authorities/<scope>/` with separate `.json` and `.tsp` files. Generated candidates and finals preserve the same scope. Browser and edge TypeScript entrypoints cannot export server scope. Node.js, Deno, and Bun entrypoints remain distinct even when they currently re-export identical isomorphic types.
 
-Runtime validators live in the companion `*-lib-core`: Zod (TypeScript), Garde (Rust), `go-playground/validator/v10` (Go), and Gleam decoders. Public `*-clients` import those public validation SDK entrypoints; clients must not copy schemas or import server validators.
+Public runtime validators live in the companion `*-lib-core`: Zod
+(TypeScript), Garde (Rust), `go-playground/validator/v10` (Go), and Gleam
+decoders. Private worker adapters validate the server JSON Schema or Protobuf
+envelope before mapping it into the semantic `ftnl-lambdas` admission model.
+Public `*-clients` import only public validation SDK entrypoints; clients must
+not copy schemas or import server validators.
 
 Route/HTTP signatures use stable `operationId` values from `ORESoftware/api-docs`. Their binding document is digest-bound into the parity receipt.

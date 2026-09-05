@@ -4,9 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test scripts/contract.test.mjs"
+    "lint:protobuf": "protoc --proto_path=protobuf --descriptor_set_out=/dev/null --include_imports --fatal_warnings protobuf/file_tunnel_worker.proto",
+    "lint:typespec": "tsp compile validation/main.tsp --no-emit --warn-as-error",
+    "test": "npm run lint:typespec && npm run lint:protobuf && npm run test:contracts",
+    "test:contracts": "node --test scripts/contract.test.mjs"
   },
   "devDependencies": {
+    "@typespec/compiler": "1.15.0",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1"
   },

@@ -1,0 +1,254 @@
+syntax = "proto3";
+
+package file_tunnel.worker.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option java_multiple_files = true;
+option java_package = "dev.filetunnel.worker.v1";
+option java_outer_classname = "FileTunnelWorkerProto";
+
+// Runtime generators consume these options to produce fail-closed field
+// validators. Cross-field invariants remain explicit semantic checks in the
+// worker core after protobuf decoding.
+message StringRules {
+  bool required = 1;
+  uint32 min_length = 2;
+  uint32 max_length = 3;
+  string pattern = 4;
+}
+
+message IntegerRules {
+  bool required = 1;
+  uint64 minimum = 2;
+  uint64 maximum = 3;
+}
+
+message MessageRules {
+  bool required = 1;
+}
+
+extend google.protobuf.FieldOptions {
+  StringRules string_rules = 51001;
+  IntegerRules integer_rules = 51002;
+  MessageRules message_rules = 51003;
+}
+
+message WorkerProductScope {
+  string scope_kind = 1 [
+    json_name = "scope_kind",
+    (string_rules) = {
+      required: true
+      pattern: "^individual$|^organization$"
+    }
+  ];
+  string scope_id = 2 [
+    json_name = "scope_id",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+}
+
+message WorkerWorkload {
+  uint32 item_count = 1 [
+    json_name = "item_count",
+    (integer_rules) = {
+      required: true
+      minimum: 1
+      maximum: 100000
+    }
+  ];
+  optional uint32 vector_dimensions = 2 [
+    json_name = "vector_dimensions",
+    (integer_rules) = {
+      minimum: 1
+      maximum: 4096
+    }
+  ];
+}
+
+message WorkerObjectRef {
+  string store_id = 1 [
+    json_name = "store_id",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  string object_id = 2 [
+    json_name = "object_id",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  string version = 3 [
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  string content_digest = 4 [
+    json_name = "content_digest",
+    (string_rules) = {
+      required: true
+      pattern: "^sha256:[0-9a-f]{64}$"
+    }
+  ];
+  uint64 expected_bytes = 5 [
+    json_name = "expected_bytes",
+    (integer_rules) = {
+      required: true
+      minimum: 1
+      maximum: 2147483648
+    }
+  ];
+}
+
+message WorkerObjectTarget {
+  string store_id = 1 [
+    json_name = "store_id",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  string object_id = 2 [
+    json_name = "object_id",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  string version = 3 [
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+}
+
+message WorkerJob {
+  string protocol = 1 [
+    (string_rules) = {
+      required: true
+      pattern: "^file-tunnel\\.worker/v1$"
+    }
+  ];
+  string job_id = 2 [
+    json_name = "job_id",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  string idempotency_key = 3 [
+    json_name = "idempotency_key",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  WorkerProductScope product_scope = 4 [
+    json_name = "product_scope",
+    (message_rules).required = true
+  ];
+  string kind = 5 [
+    (string_rules) = {
+      required: true
+      pattern: "^file_metadata$|^image_metadata$|^image_thumbnail$|^image_transcode$|^embedding_batch$|^regression_batch$|^correlation_discovery$"
+    }
+  ];
+  WorkerWorkload workload = 6 [(message_rules).required = true];
+  WorkerObjectRef input = 7 [(message_rules).required = true];
+  WorkerObjectTarget output = 8 [(message_rules).required = true];
+  uint64 submitted_at_unix = 9 [
+    json_name = "submitted_at_unix",
+    (integer_rules).required = true
+  ];
+  uint64 deadline_unix = 10 [
+    json_name = "deadline_unix",
+    (integer_rules) = {
+      required: true
+      minimum: 1
+    }
+  ];
+  uint64 max_output_bytes = 11 [
+    json_name = "max_output_bytes",
+    (integer_rules) = {
+      required: true
+      minimum: 1
+      maximum: 536870912
+    }
+  ];
+}
+
+message WorkerReceipt {
+  string protocol = 1 [
+    (string_rules) = {
+      required: true
+      pattern: "^file-tunnel\\.worker/v1$"
+    }
+  ];
+  string job_id = 2 [
+    json_name = "job_id",
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 256
+      pattern: "^[A-Za-z0-9_.-]+$"
+    }
+  ];
+  string status = 3 [
+    (string_rules) = {
+      required: true
+      pattern: "^completed$|^retryable_failure$|^terminal_failure$"
+    }
+  ];
+  string code = 4 [
+    (string_rules) = {
+      required: true
+      min_length: 1
+      max_length: 128
+      pattern: "^[a-z][a-z0-9_]*$"
+    }
+  ];
+  optional string output_digest = 5 [
+    json_name = "output_digest",
+    (string_rules).pattern = "^sha256:[0-9a-f]{64}$"
+  ];
+  optional uint64 bytes_written = 6 [
+    json_name = "bytes_written",
+    (integer_rules) = {
+      minimum: 1
+      maximum: 536870912
+    }
+  ];
+}
+
+message WorkerEnvelope {
+  oneof payload {
+    WorkerJob job = 1;
+    WorkerReceipt receipt = 2;
+  }
+}
