@@ -6,14 +6,14 @@
     "rust_desktop": {
       "repository": "file-tunnel/ftnl-desktop-app.rs",
       "status": "blocked",
-      "rationale": "The transport contract and defensive validation are ready, but no audited native Bluetooth adapter is wired into the Rust desktop application yet.",
+      "rationale": "The app-layer secure session substrate and defensive validation are implemented, but no audited native Bluetooth adapter is wired into the Rust desktop application yet.",
       "follow_up_issue": "https://github.com/file-tunnel/.github/issues/11",
       "review_expires_on": "2026-09-30"
     },
     "flutter_desktop": {
       "repository": "file-tunnel/ftnl-flutter",
       "status": "blocked",
-      "rationale": "The organization does not currently contain this companion repository, so a Flutter radio implementation and conformance evidence cannot yet be supplied.",
+      "rationale": "The Flutter secure session substrate and cross-language evidence are implemented, but a platform Bluetooth adapter and permission-gated radio flow are not yet enabled.",
       "follow_up_issue": "https://github.com/file-tunnel/.github/issues/11",
       "review_expires_on": "2026-09-30"
     }
