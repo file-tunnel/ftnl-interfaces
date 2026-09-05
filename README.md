@@ -25,6 +25,15 @@ deep links, fixtures derived from real users, or Shared Auth decisions. Source
 exclusions use SHA-256 fingerprints so raw application identifiers do not need
 to cross component boundaries.
 
+The paired desktop implementations also expose a `proximity.secure_session`
+capability: an ephemeral X25519 handshake, transcript-bound HKDF-SHA256 key
+schedule, explicit six-digit SAS confirmation, and directional
+ChaCha20-Poly1305 frames. The layer carries only opaque Shared Auth step-up,
+consented peer-information, or signed update-manifest payloads. It treats
+Bluetooth as an untrusted bearer; native adapters, permissions, background
+pairing, and unattended updates remain disabled until they pass the adapter
+acceptance gate in the companion contract fixture.
+
 The initial API is deliberately capability-based. A desktop capability can
 observe and download from one tunnel; a phone capability can declare and upload
 files to that tunnel. Pairing secrets are one-time credentials and should live

@@ -69,7 +69,8 @@ test("desktop feature manifests are complete, ordered, unique, and semantically 
   assert.deepEqual(rust, flutter);
   assert.deepEqual(ids, [...ids].sort());
   assert.equal(new Set(ids).size, ids.length);
-  assert.equal(ids.length, 12);
+  assert.equal(ids.length, 13);
+  assert.equal(ids.at(-1), "proximity.secure_session");
 });
 
 test("proximity keeps identity proofs and update binaries off the radio", async () => {
