@@ -32,7 +32,8 @@
         "desktop.tray.lifecycle",
         "desktop.window.close_to_tray",
         "desktop.window.regular",
-        "privacy.source_exclusions"
+        "privacy.source_exclusions",
+        "proximity.secure_session"
       ]
     },
     "featureSupport": {
@@ -106,8 +107,8 @@
         "implementation": {"$ref": "#/$defs/implementation"},
         "features": {
           "type": "array",
-          "minItems": 12,
-          "maxItems": 12,
+          "minItems": 13,
+          "maxItems": 13,
           "items": {"$ref": "#/$defs/featureSupport"}
         }
       },
