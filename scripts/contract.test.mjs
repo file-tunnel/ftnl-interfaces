@@ -59,6 +59,7 @@ test("desktop workspace accepts canonical documents and rejects negative vectors
   for (const fixture of [
     "desktop-workspace-parity-v1",
     "desktop-workspace-snapshot-v1",
+    "desktop-workspace-encrypted-snapshot-v1",
     "desktop-workspace-commands-v1",
   ]) {
     const document = await readJson(`fixtures/${fixture}.json`);
@@ -90,7 +91,7 @@ test("desktop feature manifests are complete, ordered, unique, and semantically 
   assert.deepEqual(rust, flutter);
   assert.deepEqual(ids, [...ids].sort());
   assert.equal(new Set(ids).size, ids.length);
-  assert.equal(ids.length, 13);
+  assert.equal(ids.length, 14);
   assert.equal(ids.at(-1), "proximity.secure_session");
 });
 
