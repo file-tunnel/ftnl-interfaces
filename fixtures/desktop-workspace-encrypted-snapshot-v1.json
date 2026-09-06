@@ -1,0 +1,8 @@
+{
+  "document_type": "encrypted_workspace_snapshot",
+  "schema_version": 1,
+  "algorithm": "xchacha20-poly1305",
+  "associated_data": "file-tunnel.desktop-workspace.v1",
+  "nonce": "IiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi",
+  "ciphertext": "-EWDYz_MifGLOUu_xAnEwAi1tLtn9YmUASgTuAKOOFUtv9k3p9P4MYQXBkc2a1VNAMtBQwSFvDkTNq6esYhPo6D6K87NQbc5O6_xh1IhsyQ9PM8bvmnEnXih4DjMCT9d55rIhrfcX0L457TIzNJ-cEkTxlsfatXaBjsaxPIVGQtH6Hjwr4jKVlBIKrHZr5Z0B1nZScH2wQHPGxB1TAn8H5iwnFbWKK4vEfQ-tofvRMs072_uVxF2P2gro36BKtDFo9WXSi9JuDILnNAqGlrbqmH24Msgg9kDrS8KqC2JJnlK9BUIZ_JCVzfiRIGfAwOE4d5kK0Twon6jaeP1B5Y-MedApEgiZdod7k-ZXm6c5bp1S2lQY6S9smfgRZmACOfqVPEglCApz8ffBPJuc_R33sPEf-Gw9IJ3QxwGeK9l2s1ofcIhYGEqyxgZTdHxPES-m6cm4DJ3G8XWpZnDDrNXqk3GYosbZrM0gkLi5Rab_OugfbEUBScUo7vkCnxzS2vsuPtPhguRPC11etyOAQLqFwhUIvimQwodwfoa4vnmaFbygbXemylNlBP7eMvZEgMPmmOlgJrawzXTY9gu-KFimaEuSF6SOqjGe0F5ywHJBdKfAFI_cS0wpMLEtlElxJVbX_uvvZe_uuSpN-SiaIKx9ussaPI_HQNefx1A"
+}

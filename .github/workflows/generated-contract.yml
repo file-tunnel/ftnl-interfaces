@@ -43,7 +43,12 @@ jobs:
             echo "Add one (a script that re-runs the generators) to enable it."
             exit 0
           fi
-          chmod -R u+w $(git ls-files -- '*generated/*' | xargs -r -n1 dirname | sort -u) 2>/dev/null || true
+          git ls-files -- '*generated/*' \
+            | xargs -r -n1 dirname \
+            | sort -u \
+            | while IFS= read -r generated_dir; do
+                chmod -R u+w "$generated_dir" 2>/dev/null || true
+              done
           bash .generated-regen.sh
           if ! git diff --quiet --exit-code; then
             echo "::error::Committed generated output does not match a fresh run of the generator."

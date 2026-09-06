@@ -6,6 +6,7 @@
   "oneOf": [
     {"$ref": "#/$defs/parityManifest"},
     {"$ref": "#/$defs/workspaceSnapshot"},
+    {"$ref": "#/$defs/encryptedWorkspaceSnapshot"},
     {"$ref": "#/$defs/workspaceCommand"},
     {"$ref": "#/$defs/commandResult"},
     {"$ref": "#/$defs/commandBatch"}
@@ -25,6 +26,7 @@
         "clipboard.clear_unpinned",
         "clipboard.deduplicate",
         "clipboard.delete",
+        "clipboard.history.encrypted_snapshot",
         "clipboard.history.text",
         "clipboard.pin",
         "clipboard.retention",
@@ -107,8 +109,8 @@
         "implementation": {"$ref": "#/$defs/implementation"},
         "features": {
           "type": "array",
-          "minItems": 13,
-          "maxItems": 13,
+          "minItems": 14,
+          "maxItems": 14,
           "items": {"$ref": "#/$defs/featureSupport"}
         }
       },
@@ -237,6 +239,34 @@
         "search_query",
         "excluded_source_fingerprints",
         "items"
+      ],
+      "additionalProperties": false
+    },
+    "encryptedWorkspaceSnapshot": {
+      "type": "object",
+      "properties": {
+        "document_type": {"const": "encrypted_workspace_snapshot"},
+        "schema_version": {"$ref": "#/$defs/schemaVersion"},
+        "algorithm": {"const": "xchacha20-poly1305"},
+        "associated_data": {"const": "file-tunnel.desktop-workspace.v1"},
+        "nonce": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{32}$",
+          "maxLength": 32
+        },
+        "ciphertext": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{22,8388608}$",
+          "maxLength": 8388608
+        }
+      },
+      "required": [
+        "document_type",
+        "schema_version",
+        "algorithm",
+        "associated_data",
+        "nonce",
+        "ciphertext"
       ],
       "additionalProperties": false
     },
