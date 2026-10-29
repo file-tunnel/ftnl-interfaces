@@ -1,21 +1,24 @@
 {
   "contract_version": 1,
   "change_id": "proximity-v1",
-  "changed_contracts": ["proximity", "desktop_companion"],
+  "changed_contracts": [
+    "proximity",
+    "desktop_companion"
+  ],
   "implementations": {
     "rust_desktop": {
       "repository": "file-tunnel/ftnl-desktop-app.rs",
       "status": "blocked",
-      "rationale": "The app-layer secure session substrate and defensive validation are implemented, but no audited native Bluetooth adapter is wired into the Rust desktop application yet.",
+      "rationale": "The app-layer secure session substrate exists, but no audited native Bluetooth adapter or permission-gated radio flow is enabled; current ftnl-desktop-app.rs README (reviewed 2026-10-29) explicitly keeps native adapters disabled.",
       "follow_up_issue": "https://github.com/file-tunnel/.github/issues/11",
-      "review_expires_on": "2026-09-30"
+      "review_expires_on": "2026-11-28"
     },
     "flutter_desktop": {
       "repository": "file-tunnel/ftnl-flutter",
       "status": "blocked",
-      "rationale": "The Flutter secure session substrate and cross-language evidence are implemented, but a platform Bluetooth adapter and permission-gated radio flow are not yet enabled.",
+      "rationale": "The Flutter secure session substrate exists, but native Bluetooth adapters, platform permissions, background pairing and unattended updates remain disabled pending the adapter acceptance gate; confirmed in the current ftnl-flutter README (reviewed 2026-10-29).",
       "follow_up_issue": "https://github.com/file-tunnel/.github/issues/11",
-      "review_expires_on": "2026-09-30"
+      "review_expires_on": "2026-11-28"
     }
   }
 }
