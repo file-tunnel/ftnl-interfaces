@@ -308,3 +308,31 @@ test("private worker definitions never enter browser or edge exports", async () 
   assert.match(nodeEntrypoint, /server/);
   assert.match(nodeEntrypoint, /WorkerJob/);
 });
+
+test("browser pairing corpus rejects ambiguous fragment capabilities", async () => {
+  const corpus = await readJson("fixtures/pairing-fragment-v1.json");
+  assert.equal(corpus.contract, "file-tunnel.portal-pairing-fragment/v1");
+  assert.ok(corpus.valid.length >= 2);
+  assert.ok(corpus.invalid.length >= 10);
+  const validPortalPairing = (input) => {
+    let uri;
+    try {
+      uri = new URL(input);
+    } catch {
+      return false;
+    }
+    return uri.protocol === "https:"
+      && uri.hostname === "upload.file-tunnel.dev"
+      && uri.username === ""
+      && uri.password === ""
+      && uri.search === ""
+      && /^\/t\/[0-9a-f-]{36}$/u.test(uri.pathname)
+      && /^#c=[A-Za-z0-9_-]{32,512}$/u.test(uri.hash);
+  };
+  for (const uri of corpus.valid) {
+    assert.equal(validPortalPairing(uri), true, "valid fixture rejected");
+  }
+  for (const uri of corpus.invalid) {
+    assert.equal(validPortalPairing(uri), false, "invalid fixture admitted");
+  }
+});

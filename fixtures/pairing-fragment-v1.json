@@ -1,0 +1,23 @@
+{
+  "contract": "file-tunnel.portal-pairing-fragment/v1",
+  "status": "draft-browser-security-contract",
+  "notes": "Portal and Flutter currently accept URL-safe 32..512-character secrets. This fixture is not proof of Rust SDK UTF-8 backward compatibility.",
+  "valid": [
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=abcdefghijklmnopqrstuvwxyz012345",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=ABCDEFGHIJKLMNOPQRSTUVWXYZ012345"
+  ],
+  "invalid": [
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=abcdefghijklmnopqrstuvwxyz012345&c=abcdefghijklmnopqrstuvwxyz012345",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=abcdefghijklmnopqrstuvwxyz012345&",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#other=1&c=abcdefghijklmnopqrstuvwxyz012345",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#%63=abcdefghijklmnopqrstuvwxyz012345",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001?c=abcdefghijklmnopqrstuvwxyz012345",
+    "http://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=abcdefghijklmnopqrstuvwxyz012345",
+    "https://user:password@upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=abcdefghijklmnopqrstuvwxyz012345",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=abcdefghijklmnopqrstuvwxyz012345%20",
+    "https://upload.file-tunnel.dev/t/018f47d2-2d9f-7a41-a2aa-1aef7d847001#c=abcdefghijklmnopqrstuvwxyz012345&debug=1"
+  ]
+}
